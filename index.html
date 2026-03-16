@@ -1236,7 +1236,7 @@
     <div class="reviews-grid">
       <div class="review-card orange">
         <div class="stars">★★★★★</div>
-        <p id="rev-1-text">"Saved me £200 on buying a drill I only used once. The pickup at the locker was super smooth!"</p>
+        <p id="rev-1-text">"Saved me A$200 on buying a drill I only used once. The pickup at the locker was super smooth!"</p>
         <div class="user-row">
           <div class="avatar"><img src="https://i.pravatar.cc/100?img=12" alt="user"></div>
           <div>
@@ -1393,7 +1393,7 @@
     </div>
 
     <div class="footer-bottom">
-      &copy; 2024 BorrowGo Inc. All rights reserved.
+      &copy; 2026 BorrowGo Inc. All rights reserved.
     </div>
   </footer>
 
@@ -1410,7 +1410,7 @@
         <div class="breadcrumbs" id="m-breadcrumbs">Home > Catalogue</div>
 
         <h2 class="modal-title" id="m-title">Item</h2>
-        <p class="modal-price" id="m-price">£0 / day</p>
+        <p class="modal-price" id="m-price">A$0 / day</p>
 
         <div class="pill-row">
           <span class="pill" id="m-pill-stock">📦 <strong id="m-stock">0</strong> <span id="m-stock-text">left</span></span>
@@ -1462,7 +1462,7 @@
     <div class="cart-foot">
       <div class="cart-total">
         <span id="cart-total-label">Estimated Total</span>
-        <span id="cartTotal">£0</span>
+        <span id="cartTotal">A$0</span>
       </div>
       <button class="btn-checkout" onclick="checkout()" id="cart-checkout">Checkout (Demo)</button>
       <div style="font-size:12px;color:#888;margin-top:10px;" id="cart-note">
@@ -1537,6 +1537,18 @@
 
     // cart: {id, qty}
     const cart = [];
+
+    function getCurrencySymbol(){
+      return isEn ? "A$" : "¥";
+    }
+
+    function getDayUnit(){
+      return isEn ? "/day" : "/天";
+    }
+
+    function formatPrice(amount){
+      return `${getCurrencySymbol()}${amount}`;
+    }
 
     /* =========================================================
        UTIL
@@ -1643,7 +1655,7 @@
             <h3>${title}</h3>
 
             <div class="meta-row">
-              <div class="price">£${item.price}<small>/day</small></div>
+              <div class="price">${formatPrice(item.price)}<small>${getDayUnit()}</small></div>
               <div class="rating" title="${ratingLabel}">
                 <span aria-hidden="true">${stars}</span>
                 <span>${ratingLabel}</span>
@@ -1681,7 +1693,7 @@
 
       // basic info
       document.getElementById('m-title').textContent = name;
-      document.getElementById('m-price').textContent = `£${cur.price} / day`;
+      document.getElementById('m-price').textContent = `${formatPrice(cur.price)} ${getDayUnit()}`;
       document.getElementById('m-img').src = cur.img;
 
       // stock / viewers
@@ -1804,7 +1816,7 @@
 
       if(cart.length===0){
         body.innerHTML = `<div style="padding:14px;color:#777;font-weight:800;">${isEn?'Your cart is empty.':'你的借阅清单是空的。'}</div>`;
-        document.getElementById('cartTotal').textContent = '£0';
+        document.getElementById('cartTotal').textContent = formatPrice(0);
         return;
       }
 
@@ -1822,7 +1834,7 @@
           <div class="cart-thumb"><img src="${item.img}" alt="${title}" onerror="this.style.display='none'"></div>
           <div class="cart-info">
             <strong>${title}</strong>
-            <span>£${item.price}/day · ${isEn?'Qty':'数量'}: ${c.qty}</span>
+            <span>${formatPrice(item.price)}${getDayUnit()} · ${isEn?'Qty':'数量'}: ${c.qty}</span>
           </div>
           <div class="cart-qty">
             <button class="qty-btn" onclick="changeQty(${c.id}, -1)">-</button>
@@ -1833,7 +1845,7 @@
         body.appendChild(row);
       });
 
-      document.getElementById('cartTotal').textContent = `£${total}`;
+      document.getElementById('cartTotal').textContent = formatPrice(total);
     }
 
     function changeQty(id, delta){
@@ -2158,7 +2170,7 @@
         m2_btn2:"Benefits",
 
         reviewsTitle:"Trusted by Neighbors",
-        rev1:`"Saved me £200 on buying a drill I only used once. The pickup at the locker was super smooth!"`,
+        rev1:`"Saved me A$200 on buying a drill I only used once. The pickup at the locker was super smooth!"`,
         rev2:`"The VR headset was in perfect condition. Great for my weekend party. Highly recommend!"`,
         rev3:`"Loved the projector for movie night. Customer support replied in minutes. Felt very secure."`,
         verified:"Verified Borrower",
