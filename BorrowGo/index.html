@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BorrowGo - 物品租赁平台</title>
+
+  <style>
+    :root{
+      --blue:#2d7bc7;
+      --orange:#f27c21;
+      --green:#2e7d32;
+      --dark:#333;
+      --light:#f4f6f8;
+      --white:#ffffff;
+      --muted:#777;
+      --shadow:0 10px 30px rgba(0,0,0,0.08);
+      --shadow2:0 20px 60px rgba(0,0,0,0.12);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      font-family:'Segoe UI','Microsoft YaHei',sans-serif;
+      margin:0; background:var(--light); color:var(--dark);
+      line-height:1.6;
+    }
+    a{ color:inherit; }
+    .container{ max-width:1280px; margin:0 auto; padding:0 5%; }
+
+    /* =========================
+       NAV（加入搜索 + 登录注册 + 购物车）
+    ========================= */
+    nav{
+      background:var(--white);
+      padding:14px 5%;
+      display:flex;
+      align-items:center;
+      gap:18px;
+      position:sticky; top:0; z-index:999;
+      box-shadow:0 4px 20px rgba(0,0,0,0.05);
+    }
+    .logo-container{ display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .logo-svg{ width:45px; height:45px; }
+    .logo-text{ font-size:26px; font-weight:800; letter-spacing:-0.5px; line-height:1; }
+    .text-blue{ color:var(--blue); }
+    .text-orange{ color:var(--orange); }
+
+    .nav-search{
+      flex:1; max-width:520px; position:relative;
+      display:flex; align-items:center;
+      margin:0 6px;
+    }
+    .nav-search input{
+      width:100%;
+      padding:10px 44px 10px 16px;
+      border-radius:999px;
+      border:1px solid #e3e3e3;
+      outline:none;
+      background:#f6f8fb;
+      font-weight:600;
+    }
+    .nav-search .icon{
+      position:absolute; right:14px; top:9px; color:#999;
+      user-select:none;
+    }
+
+    .menu{ display:flex; align-items:center; gap:18px; }
+    .menu a{ text-decoration:none; color:#555; font-weight:700; font-size:14px; transition:.2s; }
+    .menu a:hover{ color:var(--blue); }
+
+    .nav-actions{ display:flex; align-items:center; gap:10px; }
+    .nav-split{
+      width:1px; height:26px; background:#e6e6e6;
+      margin:0 4px;
+    }
+
+    .link-login{ color:var(--blue) !important; font-weight:800; }
+    .btn-signup{
+      background:var(--blue);
+      color:#fff;
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:900;
+      border:none;
+      cursor:pointer;
+      transition:.2s;
+    }
+    .btn-signup:hover{ transform:translateY(-1px); }
+
+    .btn-ghost{
+      background:#111;
+      color:#fff;
+      border:none;
+      padding:8px 14px;
+      border-radius:10px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.2s;
+    }
+    .btn-ghost:hover{ transform:translateY(-1px); }
+
+    .btn-cart{
+      border:none;
+      background:#fff;
+      border:1px solid #e5e5e5;
+      border-radius:999px;
+      padding:8px 12px;
+      cursor:pointer;
+      font-weight:900;
+      display:flex; align-items:center; gap:8px;
+      box-shadow:0 8px 18px rgba(0,0,0,0.06);
+    }
+    .cart-badge{
+      min-width:18px;
+      height:18px;
+      padding:0 6px;
+      border-radius:999px;
+      background:var(--orange);
+      color:#fff;
+      font-size:12px;
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+    header{
+      background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);
+      height:560px;
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      text-align:center; color:white;
+      position:relative; overflow:hidden;
+      padding:0 5%;
+    }
+    header::before{
+      content:'';
+      position:absolute; inset:-120px;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(255,255,255,0.18), transparent 55%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,0.14), transparent 55%),
+        radial-gradient(circle at 60% 80%, rgba(255,255,255,0.10), transparent 60%);
+      filter:blur(2px);
+      pointer-events:none;
+    }
+    header h1{
+      margin:0 0 14px;
+      font-size:56px;
+      text-shadow:0 4px 10px rgba(0,0,0,0.35);
+      position:relative;
+    }
+    header p{
+      margin:0 0 26px;
+      font-size:22px;
+      font-weight:300;
+      max-width:860px;
+      position:relative;
+      opacity:.95;
+    }
+    .cta-btn{
+      background:var(--orange);
+      color:#fff;
+      padding:16px 46px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:18px;
+      text-decoration:none;
+      border:none;
+      cursor:pointer;
+      box-shadow:0 12px 24px rgba(242,124,33,0.28);
+      transition:.2s;
+      position:relative;
+      display:inline-block;
+    }
+    .cta-btn:hover{ transform:translateY(-3px); background:#d86815; }
+
+    /* =========================
+       SECTION
+    ========================= */
+    .section{ padding:80px 5%; max-width:1280px; margin:0 auto; }
+    .section-title{
+      text-align:center;
+      font-size:36px;
+      margin:0 0 50px;
+      font-weight:900;
+      position:relative;
+    }
+    .section-title::after{
+      content:'';
+      display:block;
+      width:60px; height:5px;
+      background:var(--orange);
+      margin:15px auto 0;
+      border-radius:3px;
+    }
+
+    /* =========================
+       TRUST BADGES（信任体系）
+    ========================= */
+    .trust-row{
+      background:#fff;
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:26px 24px;
+      max-width:1060px;
+      margin:-38px auto 0;
+      position:relative;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .trust-item{
+      flex:1; min-width:220px;
+      display:flex; align-items:flex-start; gap:12px;
+    }
+    .trust-ic{
+      width:44px; height:44px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900;
+      background:rgba(45,123,199,0.12);
+      color:var(--blue);
+      font-size:20px;
+    }
+    .trust-item:nth-child(2) .trust-ic{ background:rgba(242,124,33,0.12); color:var(--orange); }
+    .trust-item:nth-child(3) .trust-ic{ background:rgba(46,125,50,0.12); color:var(--green); }
+    .trust-title{ font-weight:900; margin:0; }
+    .trust-desc{ margin:2px 0 0; color:#666; font-size:13px; }
+
+    /* =========================
+       HOW IT WORKS（服务流程）
+    ========================= */
+    .how{
+      background:#fff;
+      padding:70px 5%;
+      text-align:center;
+    }
+    .how h2{ font-size:28px; margin:0 0 46px; }
+    .how-grid{
+      display:flex;
+      justify-content:space-around;
+      flex-wrap:wrap;
+      gap:30px;
+      max-width:1180px;
+      margin:0 auto;
+    }
+    .how-step{
+      flex:1; min-width:250px;
+      padding:18px 10px;
+    }
+    .how-circle{
+      width:80px; height:80px;
+      border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:30px; font-weight:900;
+      margin:0 auto 18px;
+    }
+    .how-step:nth-child(1) .how-circle{ background:#e3f2fd; color:var(--blue); }
+    .how-step:nth-child(2) .how-circle{ background:#fff3e0; color:var(--orange); }
+    .how-step:nth-child(3) .how-circle{ background:#e8f5e9; color:var(--green); }
+    .how-step h3{ margin:0 0 8px; font-size:18px; }
+    .how-step p{ margin:0; color:#666; font-size:15px; }
+
+    /* =========================
+       CATALOGUE（电商功能：搜索+排序+筛选）
+    ========================= */
+    .catalogue-tools{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:12px;
+      margin:0 auto 24px;
+      max-width:1180px;
+    }
+    .filters{
+      display:flex; gap:10px; flex-wrap:wrap;
+      justify-content:center;
+      margin:0 auto 22px;
+    }
+    .filter-btn{
+      padding:10px 22px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid #e2e2e2;
+      cursor:pointer;
+      font-weight:800;
+      color:#666;
+      transition:.2s;
+    }
+    .filter-btn.active,.filter-btn:hover{
+      background:var(--blue);
+      color:#fff;
+      border-color:var(--blue);
+      box-shadow:0 8px 18px rgba(45,123,199,0.18);
+    }
+
+    .tool-group{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+    }
+    .select, .toggle{
+      background:#fff;
+      border:1px solid #e2e2e2;
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .toggle{
+      display:flex; gap:10px; align-items:center;
+    }
+    .toggle input{ accent-color:var(--blue); transform:scale(1.1); }
+
+    .membership{
+      background:#fff;
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:28px;
+      max-width:1180px;
+      margin:10px auto 36px;
+    }
+    .membership h3{
+      margin:0 0 14px;
+      font-size:20px;
+      font-weight:900;
+    }
+    .member-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+      gap:18px;
+    }
+    .member-card{
+      border:1px solid #eee;
+      border-radius:18px;
+      padding:18px;
+      background:#fafafa;
+      position:relative;
+      overflow:hidden;
+    }
+    .member-card strong{ font-size:16px; }
+    .member-card ul{ margin:10px 0 0; padding-left:18px; color:#666; }
+    .member-card li{ margin:6px 0; }
+    .member-tag{
+      position:absolute; right:16px; top:16px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      background:rgba(242,124,33,0.14);
+      color:var(--orange);
+    }
+    .member-card.plus{
+      background:linear-gradient(135deg, rgba(45,123,199,0.10), rgba(242,124,33,0.08));
+      border-color:rgba(45,123,199,0.22);
+    }
+    .member-card.plus .member-tag{
+      background:rgba(45,123,199,0.14);
+      color:var(--blue);
+    }
+    .member-action{
+      margin-top:14px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .member-action button{
+      border:none; cursor:pointer;
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:900;
+    }
+    .btn-outline{
+      background:#fff; border:1px solid #e2e2e2;
+    }
+    .btn-primary{
+      background:var(--blue); color:#fff;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+      gap:30px;
+    }
+    .card{
+      background:#fff;
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 8px 20px rgba(0,0,0,0.04);
+      transition:.3s;
+      position:relative;
+    }
+    .card:hover{ transform:translateY(-7px); box-shadow:0 16px 34px rgba(0,0,0,0.10); }
+
+    .img-box{
+      height:220px;
+      position:relative;
+      overflow:hidden;
+      background:#f6f7fb;
+    }
+    .img-box img{
+      width:100%; height:100%;
+      object-fit:cover;
+      position:absolute; inset:0;
+      z-index:2;
+      transition:transform .6s;
+    }
+    .card:hover .img-box img{ transform:scale(1.08); }
+
+    /* 骨架屏 */
+    .skeleton{
+      position:absolute; inset:0;
+      background:linear-gradient(90deg, #eee 25%, #f6f6f6 37%, #eee 63%);
+      background-size:400% 100%;
+      animation:shimmer 1.2s infinite;
+      z-index:1;
+    }
+    @keyframes shimmer{
+      0%{ background-position:100% 0; }
+      100%{ background-position:0 0; }
+    }
+
+    .tag{
+      position:absolute; top:14px; left:14px;
+      background:rgba(255,255,255,0.95);
+      padding:6px 12px;
+      border-radius:10px;
+      font-size:12px;
+      font-weight:900;
+      color:var(--blue);
+      z-index:3;
+      box-shadow:0 8px 16px rgba(0,0,0,0.08);
+    }
+    /* 热门标签（Marketing） */
+    .hot-badge{
+      position:absolute; top:14px; right:14px;
+      background:#ff3b30;
+      color:#fff;
+      padding:6px 10px;
+      border-radius:10px;
+      font-size:12px;
+      font-weight:900;
+      z-index:3;
+      box-shadow:0 10px 22px rgba(255,59,48,0.22);
+    }
+
+    .card-content{ padding:22px 22px 18px; }
+    .card h3{ margin:0 0 8px; font-size:19px; font-weight:900; }
+    .meta-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .price{ font-size:22px; font-weight:900; }
+    .price small{ font-size:13px; font-weight:700; color:#888; }
+
+    .rating{
+      display:flex; align-items:center; gap:6px;
+      color:#f5c518;
+      font-weight:900;
+      font-size:14px;
+      user-select:none;
+    }
+    .rating span{ color:#666; font-weight:800; font-size:12px; }
+
+    .card-actions{
+      display:flex; gap:10px; margin-top:14px;
+    }
+    .btn{
+      flex:1;
+      border:none;
+      cursor:pointer;
+      border-radius:10px;
+      padding:10px 12px;
+      font-weight:900;
+      transition:.2s;
+    }
+    .btn-view{ background:var(--blue); color:#fff; }
+    .btn-view:hover{ background:#1a5c9e; }
+    .btn-add{ background:#fff; border:1px solid #e5e5e5; }
+    .btn-add:hover{ transform:translateY(-1px); }
+
+    .availability{
+      margin-top:10px;
+      font-size:12px;
+      color:#666;
+      display:flex; align-items:center; gap:8px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background:#bbb;
+      display:inline-block;
+    }
+    .dot.ok{ background:var(--green); }
+    .dot.low{ background:#ff9500; }
+    .dot.out{ background:#ff3b30; }
+
+    /* =========================
+       REVIEWS（好评展示区）
+    ========================= */
+    .reviews-wrap{
+      background:#fff;
+      padding:80px 5%;
+    }
+    .reviews-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+      gap:30px;
+      max-width:1280px;
+      margin:0 auto;
+    }
+    .review-card{
+      background:#f9f9f9;
+      padding:30px;
+      border-radius:12px;
+      position:relative;
+      box-shadow:0 10px 24px rgba(0,0,0,0.06);
+    }
+    .review-card.orange{ border-left:5px solid var(--orange); }
+    .review-card.blue{ border-left:5px solid var(--blue); }
+    .stars{ color:#f5c518; font-size:20px; margin-bottom:10px; }
+    .review-card p{ margin:0 0 18px; color:#555; font-style:italic; }
+    .user-row{ display:flex; align-items:center; gap:12px; }
+    .avatar{
+      width:42px; height:42px;
+      border-radius:50%;
+      overflow:hidden;
+      background:#ddd;
+      flex:0 0 auto;
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; }
+    .verified{ font-size:12px; color:#888; }
+
+    /* =========================
+       FAQ（折叠面板）
+    ========================= */
+    .faq{
+      background:#fff;
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:26px;
+      max-width:980px;
+      margin:0 auto;
+    }
+    details{
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:14px 16px;
+      background:#fafafa;
+      margin:12px 0;
+    }
+    summary{
+      cursor:pointer;
+      font-weight:900;
+      outline:none;
+      list-style:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    details p{ margin:10px 0 0; color:#666; }
+
+    /* =========================
+       LOCATIONS（地图 + 信息）
+    ========================= */
+    .location-card{
+      background:#fff;
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:0 10px 40px rgba(0,0,0,0.10);
+      display:flex;
+      flex-wrap:wrap;
+    }
+    .loc-image{
+      flex:1.5; min-width:300px;
+      height:420px;
+      position:relative;
+      background:#222;
+      overflow:hidden;
+    }
+    #map{ width:100%; height:100%; }
+    .leaflet-container{ background:#e9ecef; }
+
+    .loc-image::after{
+      content:'Zhengzhou Map';
+      position:absolute;
+      bottom:18px; left:18px;
+      background:#fff;
+      padding:6px 14px;
+      border-radius:999px;
+      font-weight:900;
+      opacity:.92;
+      box-shadow:0 10px 22px rgba(0,0,0,0.12);
+      z-index:600;
+      pointer-events:none;
+    }
+
+    .loc-content{
+      flex:1;
+      padding:46px;
+      min-width:300px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:24px;
+    }
+    .loc-row h3{
+      margin:0 0 10px;
+      font-size:22px;
+      color:var(--blue);
+      font-weight:900;
+      display:flex; gap:10px; align-items:center;
+    }
+    .status-badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px;
+      border-radius:8px;
+      background:#e8f5e9;
+      color:var(--green);
+      font-weight:900;
+      font-size:13px;
+      margin-top:10px;
+    }
+    .mini-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .btn-mini{
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:9px 12px;
+      font-weight:900;
+      background:#fff;
+      border:1px solid #e2e2e2;
+    }
+    .btn-mini.primary{
+      background:var(--blue);
+      color:#fff;
+      border:none;
+    }
+
+    /* =========================
+       NEWSLETTER（订阅）
+    ========================= */
+    .newsletter{
+      background:linear-gradient(to right, #2d7bc7, #2a5298);
+      padding:64px 5%;
+      text-align:center;
+      color:#fff;
+    }
+    .newsletter h2{ margin:0 0 10px; font-size:30px; }
+    .newsletter p{ margin:0 0 26px; opacity:.92; }
+    .newsletter form{
+      max-width:520px;
+      margin:0 auto;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .newsletter input{
+      flex:1; min-width:240px;
+      padding:14px;
+      border-radius:10px;
+      border:none;
+      outline:none;
+      font-weight:700;
+    }
+    .newsletter button{
+      padding:14px 24px;
+      border-radius:10px;
+      border:none;
+      background:var(--orange);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    /* =========================
+       FOOTER（专业 + 法律条款入口）
+    ========================= */
+    footer{
+      background:#1a1a1a;
+      color:#bbb;
+      padding:60px 5% 20px;
+    }
+    .footer-grid{
+      max-width:1280px;
+      margin:0 auto 50px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+      gap:40px;
+    }
+    footer h4{
+      color:#fff;
+      margin:0 0 18px;
+      font-size:18px;
+    }
+    .footer-grid p{ font-size:14px; line-height:1.7; margin:0; }
+    .footer-grid ul{ list-style:none; padding:0; margin:0; }
+    .footer-grid li{ line-height:2.2; }
+    .footer-grid a{ color:#bbb; text-decoration:none; }
+    .footer-grid a:hover{ color:#fff; }
+    .footer-bottom{
+      border-top:1px solid #333;
+      padding-top:18px;
+      text-align:center;
+      font-size:13px;
+    }
+
+    /* =========================
+       MODAL（详情 + 面包屑 + 库存/浏览/倒计时）
+    ========================= */
+    #modal{
+      display:none;
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.7);
+      z-index:2000;
+      justify-content:center;
+      align-items:center;
+      backdrop-filter:blur(6px);
+      padding:22px;
+    }
+    .modal-box{
+      background:#fff;
+      width:100%;
+      max-width:980px;
+      border-radius:22px;
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+      position:relative;
+      display:grid;
+      grid-template-columns: 1.1fr 1fr;
+      min-height:520px;
+    }
+    .modal-close{
+      position:absolute;
+      right:18px; top:14px;
+      font-size:30px;
+      cursor:pointer;
+      color:#999;
+      z-index:5;
+      user-select:none;
+    }
+    .modal-left{
+      position:relative;
+      background:#f6f7fb;
+      padding:0;
+      overflow:hidden;
+    }
+    .modal-left img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .modal-right{
+      padding:26px 26px 22px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .breadcrumbs{
+      font-size:12px;
+      color:#888;
+      font-weight:800;
+      margin-bottom:4px;
+      user-select:none;
+    }
+    .modal-title{ margin:0; font-size:26px; font-weight:900; }
+    .modal-price{ color:var(--blue); font-weight:900; font-size:24px; margin:0; }
+    .pill-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+    .pill{
+      font-size:12px;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#f3f5f7;
+      color:#555;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .pill strong{ color:#111; }
+    .hr{ height:1px; background:#eee; margin:10px 0; }
+    .modal-desc{ margin:0; color:#666; }
+
+    .modal-form{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+    .modal-form label{ font-weight:900; font-size:13px; color:#444; }
+    .modal-form input{
+      width:100%;
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      font-family:inherit;
+      font-weight:700;
+    }
+    .modal-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .btn-wide{
+      flex:1;
+      border:none;
+      border-radius:12px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .btn-confirm{ background:var(--orange); color:#fff; }
+    .btn-addcart{ background:#fff; border:1px solid #e2e2e2; }
+    .fineprint{ font-size:12px; color:#888; margin:6px 0 0; }
+
+    .review-mini{
+      margin-top:10px;
+      background:#fafafa;
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:12px 12px;
+    }
+    .review-mini .r-stars{ color:#f5c518; font-weight:900; margin-bottom:6px; }
+    .review-mini p{ margin:0; color:#666; font-size:13px; }
+
+    /* =========================
+       CART DRAWER（购物车/借阅清单）
+    ========================= */
+    #cartDrawer{
+      position:fixed;
+      top:0; right:0;
+      width:380px;
+      height:100%;
+      background:#fff;
+      box-shadow:-20px 0 60px rgba(0,0,0,0.18);
+      z-index:2200;
+      transform:translateX(110%);
+      transition:.25s ease;
+      display:flex;
+      flex-direction:column;
+    }
+    #cartDrawer.open{ transform:translateX(0); }
+    .cart-head{
+      padding:18px;
+      border-bottom:1px solid #eee;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .cart-head h3{ margin:0; font-weight:900; }
+    .cart-close{ font-size:26px; cursor:pointer; color:#888; user-select:none; }
+    .cart-body{
+      padding:14px 18px;
+      overflow:auto;
+      flex:1;
+    }
+    .cart-item{
+      display:flex;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px solid #f0f0f0;
+      align-items:center;
+    }
+    .cart-thumb{
+      width:64px; height:56px;
+      border-radius:12px;
+      overflow:hidden;
+      background:#f6f7fb;
+      flex:0 0 auto;
+    }
+    .cart-thumb img{ width:100%; height:100%; object-fit:cover; }
+    .cart-info{ flex:1; }
+    .cart-info strong{ display:block; font-size:14px; }
+    .cart-info span{ display:block; font-size:12px; color:#888; }
+    .cart-qty{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:900;
+    }
+    .qty-btn{
+      width:28px; height:28px;
+      border-radius:8px;
+      border:1px solid #e2e2e2;
+      background:#fff;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .cart-foot{
+      padding:16px 18px;
+      border-top:1px solid #eee;
+    }
+    .cart-total{
+      display:flex; justify-content:space-between; align-items:center;
+      font-weight:900;
+      margin-bottom:12px;
+    }
+    .btn-checkout{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:var(--blue);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    /* =========================
+       LEGAL MODAL（隐私政策/服务条款）
+    ========================= */
+    #legalModal{
+      display:none;
+      position:fixed; inset:0;
+      z-index:2400;
+      background:rgba(0,0,0,0.65);
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      backdrop-filter:blur(5px);
+    }
+    .legal-box{
+      width:100%;
+      max-width:860px;
+      background:#fff;
+      border-radius:18px;
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+    }
+    .legal-head{
+      padding:16px 18px;
+      border-bottom:1px solid #eee;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .legal-head h3{ margin:0; font-weight:900; }
+    .legal-body{
+      padding:16px 18px;
+      max-height:70vh;
+      overflow:auto;
+      color:#555;
+    }
+    .legal-body p{ margin:0 0 12px; }
+
+    /* =========================
+       TOAST（提示）
+    ========================= */
+    #toast{
+      position:fixed;
+      left:50%;
+      bottom:26px;
+      transform:translateX(-50%);
+      background:#111;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      box-shadow:0 14px 26px rgba(0,0,0,0.22);
+      opacity:0;
+      pointer-events:none;
+      transition:.25s;
+      z-index:2600;
+    }
+    #toast.show{ opacity:1; }
+
+    /* =========================
+       CUSTOMER CHAT（在线客服悬浮）
+    ========================= */
+    #chatFab{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      width:54px; height:54px;
+      border-radius:50%;
+      background:var(--orange);
+      color:#fff;
+      border:none;
+      cursor:pointer;
+      font-size:22px;
+      box-shadow:0 18px 40px rgba(242,124,33,0.28);
+      z-index:2300;
+    }
+    #chatBox{
+      position:fixed;
+      right:18px;
+      bottom:84px;
+      width:320px;
+      background:#fff;
+      border-radius:18px;
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+      z-index:2300;
+      display:none;
+    }
+    .chat-head{
+      background:linear-gradient(135deg, var(--blue), #2a5298);
+      color:#fff;
+      padding:12px 14px;
+      font-weight:900;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .chat-close{ cursor:pointer; font-size:18px; user-select:none; }
+    .chat-body{
+      padding:12px 14px;
+      max-height:280px;
+      overflow:auto;
+      color:#555;
+      font-size:13px;
+      background:#fafafa;
+    }
+    .chat-bubble{
+      background:#fff;
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:10px 12px;
+      margin:10px 0;
+      box-shadow:0 10px 20px rgba(0,0,0,0.04);
+    }
+    .chat-actions{
+      padding:10px 12px;
+      border-top:1px solid #eee;
+      display:flex;
+      gap:10px;
+    }
+    .chat-actions button{
+      flex:1;
+      border:none;
+      border-radius:12px;
+      padding:10px;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .chat-actions .btn1{ background:#fff; border:1px solid #e2e2e2; }
+    .chat-actions .btn2{ background:var(--blue); color:#fff; }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .modal-box{ grid-template-columns:1fr; }
+      .modal-left{ height:260px; }
+    }
+    @media (max-width: 860px){
+      .nav-search{ display:none; }
+      .menu{ display:none; }
+    }
+    @media (max-width: 768px){
+      header h1{ font-size:40px; }
+      header p{ font-size:18px; }
+      .trust-row{ margin-top:-26px; }
+      .loc-image{ height:280px; }
+      .loc-content{ padding:28px; }
+      #cartDrawer{ width:92vw; }
+    }
+  </style>
+
+  <!-- Leaflet（可拖动/缩放地图） -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.css" rel="stylesheet">
+  <script src="https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+</head>
+
+<body>
+
+  <!-- ========================= NAV ========================= -->
+  <nav>
+    <!-- Logo（保持你原始 SVG + BorrowGo） -->
+    <a href="#hero" class="logo-container">
+      <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50 C15 30.67 30.67 15 50 15" stroke="#2d7bc7" stroke-width="10" stroke-linecap="round"/>
+        <path d="M50 5 L65 15 L50 25" fill="none" stroke="#2d7bc7" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M45 45 L65 65" stroke="#f27c21" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="42" cy="42" r="10" stroke="#f27c21" stroke-width="6" fill="white"/>
+      </svg>
+      <div class="logo-text">
+        <span class="text-blue">Borrow</span><span class="text-orange">Go</span>
+      </div>
+    </a>
+
+    <!-- 搜索框（电商必备） -->
+    <div class="nav-search">
+      <input id="navSearch" type="text" placeholder="Search for tools, cameras..." />
+      <span class="icon">🔍</span>
+    </div>
+
+    <div class="menu">
+      <a href="#hero" id="nav-home">Home</a>
+      <a href="#catalogue" id="nav-cat">Catalogue</a>
+      <a href="#locations" id="nav-loc">Locations</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-cart" onclick="toggleCart(true)">
+        🛒 <span id="cartCount" class="cart-badge">0</span>
+      </button>
+
+      <div class="nav-split"></div>
+
+      <a href="#" class="link-login" id="nav-login" onclick="mockAuth(event,'login')">Log in</a>
+      <button class="btn-signup" id="nav-signup" onclick="mockAuth(event,'signup')">Sign up</button>
+
+      <button class="btn-ghost" onclick="toggleLang()">CN / EN</button>
+    </div>
+  </nav>
+
+  <!-- ========================= HERO ========================= -->
+  <header id="hero">
+    <h1 id="txt-hero">Own Less. Do More.</h1>
+    <p id="txt-hero-sub">Your city's premier library of things. Borrow high-quality tools, tech, and party gear instantly.</p>
+    <a href="#catalogue" class="cta-btn" id="btn-hero">Explore Library</a>
+  </header>
+
+  <!-- 信任徽章（Trust Badges） -->
+  <div class="trust-row">
+    <div class="trust-item">
+      <div class="trust-ic">🛡️</div>
+      <div>
+        <p class="trust-title" id="trust-1-title">Damage Protection</p>
+        <p class="trust-desc" id="trust-1-desc">Optional coverage for accidental damage during rentals.</p>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-ic">💳</div>
+      <div>
+        <p class="trust-title" id="trust-2-title">Deposit Escrow</p>
+        <p class="trust-desc" id="trust-2-desc">Deposits held securely and released after return inspection.</p>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-ic">✅</div>
+      <div>
+        <p class="trust-title" id="trust-3-title">Verified Users</p>
+        <p class="trust-desc" id="trust-3-desc">Identity verification for borrowers and partners.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works（服务闭环流程） -->
+  <section class="how">
+    <h2 id="how-title">How BorrowGo Works</h2>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-circle">1</div>
+        <h3 id="how-1-title">Book Online</h3>
+        <p id="how-1-desc">Browse our inventory and reserve items for the dates you need.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-circle">2</div>
+        <h3 id="how-2-title">Pick Up</h3>
+        <p id="how-2-desc">Collect from our 24/7 smart lockers or central hub using a QR code.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-circle">3</div>
+        <h3 id="how-3-title">Enjoy & Return</h3>
+        <p id="how-3-desc">Use the item, then drop it back. We handle cleaning and maintenance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= CATALOGUE ========================= -->
+  <section id="catalogue" class="section">
+    <h2 class="section-title" id="txt-cat-title">Catalogue</h2>
+
+    <!-- 高级筛选工具条 -->
+    <div class="catalogue-tools">
+      <div class="tool-group">
+        <select id="sortSelect" class="select" onchange="applyFilters()">
+          <option value="default" id="sort-default">Sort: Recommended</option>
+          <option value="price-asc" id="sort-pa">Price: Low to High</option>
+          <option value="price-desc" id="sort-pd">Price: High to Low</option>
+          <option value="rating-desc" id="sort-rd">Rating: High to Low</option>
+        </select>
+
+        <label class="toggle" title="Only show available items">
+          <input id="onlyAvailable" type="checkbox" onchange="applyFilters()" />
+          <span id="toggle-available">Only available</span>
+        </label>
+      </div>
+
+      <div class="tool-group">
+        <span style="font-weight:900;color:#666;" id="resultCount">0 items</span>
+      </div>
+    </div>
+
+    <!-- 分类按钮 -->
+    <div class="filters">
+      <button class="filter-btn active" onclick="setCategory('All', this)">All</button>
+      <button class="filter-btn" onclick="setCategory('DIY', this)">DIY</button>
+      <button class="filter-btn" onclick="setCategory('Tech', this)">Tech</button>
+      <button class="filter-btn" onclick="setCategory('Party', this)">Party</button>
+      <button class="filter-btn" onclick="setCategory('Home', this)">Home</button>
+    </div>
+
+    <!-- 会员体系展示 -->
+    <div class="membership">
+      <h3 id="member-title">Membership</h3>
+      <div class="member-grid">
+        <div class="member-card">
+          <span class="member-tag" id="member-tag-1">Standard</span>
+          <strong id="member-1-title">Standard Member</strong>
+          <ul>
+            <li id="member-1-1">Pay deposit for higher-value items</li>
+            <li id="member-1-2">Regular pricing</li>
+            <li id="member-1-3">Basic support</li>
+          </ul>
+          <div class="member-action">
+            <button class="btn-outline" onclick="showToast(isEn?'Standard plan selected':'已选择普通会员')">
+              <span id="member-1-btn">Choose</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="member-card plus">
+          <span class="member-tag" id="member-tag-2">Plus</span>
+          <strong id="member-2-title">BorrowGo Plus</strong>
+          <ul>
+            <li id="member-2-1">Lower / no deposit on most items</li>
+            <li id="member-2-2">Exclusive discounts (up to 50% off)</li>
+            <li id="member-2-3">Priority support & faster pickup</li>
+          </ul>
+          <div class="member-action">
+            <button class="btn-primary" onclick="showToast(isEn?'Plus activated (demo)':'Plus 已开通（演示）')">
+              <span id="member-2-btn">Upgrade</span>
+            </button>
+            <button class="btn-outline" onclick="showToast(isEn?'See benefits (demo)':'查看权益（演示）')">
+              <span id="member-2-btn2">Benefits</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商品网格 -->
+    <div class="grid" id="item-grid"></div>
+  </section>
+
+  <!-- ========================= REVIEWS（Trusted by Neighbors） ========================= -->
+  <section class="reviews-wrap">
+    <h2 class="section-title" id="reviews-title">Trusted by Neighbors</h2>
+    <div class="reviews-grid">
+      <div class="review-card orange">
+        <div class="stars">★★★★★</div>
+        <p id="rev-1-text">"Saved me A$200 on buying a drill I only used once. The pickup at the locker was super smooth!"</p>
+        <div class="user-row">
+          <div class="avatar"><img src="https://i.pravatar.cc/100?img=12" alt="user"></div>
+          <div>
+            <strong>Sarah Jenkins</strong><br>
+            <span class="verified" id="rev-1-badge">Verified Borrower</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card blue">
+        <div class="stars">★★★★★</div>
+        <p id="rev-2-text">"The VR headset was in perfect condition. Great for my weekend party. Highly recommend!"</p>
+        <div class="user-row">
+          <div class="avatar"><img src="https://i.pravatar.cc/100?img=33" alt="user"></div>
+          <div>
+            <strong>Mike Chen</strong><br>
+            <span class="verified" id="rev-2-badge">Verified Borrower</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card orange">
+        <div class="stars">★★★★★</div>
+        <p id="rev-3-text">"Loved the projector for movie night. Customer support replied in minutes. Felt very secure."</p>
+        <div class="user-row">
+          <div class="avatar"><img src="https://i.pravatar.cc/100?img=48" alt="user"></div>
+          <div>
+            <strong>王雅婷</strong><br>
+            <span class="verified" id="rev-3-badge">Verified Borrower</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= FAQ（Support & Help） ========================= -->
+  <section class="section" style="padding-top:60px;">
+    <h2 class="section-title" id="faq-title">Help & FAQ</h2>
+    <div class="faq">
+      <details>
+        <summary id="faq-q1">What if I accidentally damage an item?</summary>
+        <p id="faq-a1">You can choose Damage Protection at checkout. If damage happens, we’ll guide you through a simple claim process.</p>
+      </details>
+      <details>
+        <summary id="faq-q2">Do I need to clean the item before returning?</summary>
+        <p id="faq-a2">Light cleaning is appreciated, but we handle professional cleaning and maintenance after each rental.</p>
+      </details>
+      <details>
+        <summary id="faq-q3">How does deposit escrow work?</summary>
+        <p id="faq-a3">Deposits are held securely and automatically released after the return inspection is completed.</p>
+      </details>
+      <details>
+        <summary id="faq-q4">Can I cancel my booking?</summary>
+        <p id="faq-a4">Yes. Cancellation rules vary by item and date. In this demo, cancellation is always allowed before pickup day.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ========================= LOCATIONS（可缩放地图） ========================= -->
+  <section id="locations" class="section">
+    <h2 class="section-title" id="txt-loc-title">Pick-up Locations</h2>
+
+    <div class="location-card">
+      <div class="loc-image">
+        <div id="map"></div>
+      </div>
+
+      <div class="loc-content">
+        <div class="loc-row">
+          <h3>📍 <span id="loc-1-title">Greenland Twin Towers</span></h3>
+          <p id="txt-addr-1">
+            Greenland Central Plaza, South Tower,<br>
+            Dongfeng South Road,<br>
+            Zhengdong New District, Zhengzhou
+          </p>
+          <span class="status-badge">✅ <span id="loc-1-badge">Available Now</span></span>
+          <div class="mini-actions">
+            <button class="btn-mini primary" onclick="openMarker(1)" id="btn-focus-1">Focus on Map</button>
+            <button class="btn-mini" onclick="copyCoords(1)" id="btn-copy-1">Copy Coordinates</button>
+          </div>
+        </div>
+
+        <div class="loc-row">
+          <h3>📍 <span id="loc-2-title">Self-Service Locker</span></h3>
+          <p id="txt-addr-2">
+            Zhengzhou East Railway Station,<br>
+            West Plaza Exit B
+          </p>
+          <span class="status-badge">✅ <span id="loc-2-badge">24/7 Access</span></span>
+          <div class="mini-actions">
+            <button class="btn-mini primary" onclick="openMarker(2)" id="btn-focus-2">Focus on Map</button>
+            <button class="btn-mini" onclick="copyCoords(2)" id="btn-copy-2">Copy Coordinates</button>
+          </div>
+        </div>
+
+        <div style="font-size:12px;color:#777;line-height:1.6;">
+          <strong id="precise-note-title">Precision Note:</strong>
+          <span id="precise-note">
+            Pins are auto-geocoded by address (Photon → Nominatim). For 100% exact points, you can set LAT/LNG in code directly.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= NEWSLETTER（营销转化） ========================= -->
+  <section class="newsletter">
+    <h2 id="news-title">Don't Miss Out!</h2>
+    <p id="news-desc">Join our community and get <strong>20% off</strong> your first rental.</p>
+
+    <form onsubmit="subscribe(event)">
+      <input id="newsEmail" type="email" placeholder="Enter your email address" required>
+      <button type="submit" id="news-btn">Subscribe</button>
+    </form>
+  </section>
+
+  <!-- ========================= FOOTER（专业 + 法律） ========================= -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <h4>BorrowGo</h4>
+        <p id="foot-about">
+          Empowering communities to own less and do more. The smart way to access the things you need.
+        </p>
+      </div>
+
+      <div>
+        <h4 id="foot-company-title">Company</h4>
+        <ul>
+          <li><a href="#" onclick="mockLink(event)" id="foot-aboutus">About Us</a></li>
+          <li><a href="#" onclick="mockLink(event)" id="foot-careers">Careers</a></li>
+          <li><a href="#" onclick="mockLink(event)" id="foot-press">Press</a></li>
+          <li><a href="#" onclick="mockLink(event)" id="foot-blog">Blog</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 id="foot-support-title">Support</h4>
+        <ul>
+          <li><a href="#" onclick="mockLink(event)" id="foot-help">Help Center</a></li>
+          <li><a href="#" onclick="mockLink(event)" id="foot-safety">Safety Information</a></li>
+          <li><a href="#" onclick="mockLink(event)" id="foot-cancel">Cancellation Options</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 id="foot-legal-title">Legal</h4>
+        <ul>
+          <li><a href="#" onclick="openLegal(event,'privacy')" id="foot-privacy">Privacy Policy</a></li>
+          <li><a href="#" onclick="openLegal(event,'terms')" id="foot-terms">Terms of Service</a></li>
+          <li><a href="#" onclick="openLegal(event,'cookie')" id="foot-cookie">Cookie Policy</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      &copy; 2026 BorrowGo Inc. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- ========================= MODAL（详情页） ========================= -->
+  <div id="modal">
+    <div class="modal-box">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+
+      <div class="modal-left">
+        <img id="m-img" src="" alt="item">
+      </div>
+
+      <div class="modal-right">
+        <div class="breadcrumbs" id="m-breadcrumbs">Home > Catalogue</div>
+
+        <h2 class="modal-title" id="m-title">Item</h2>
+        <p class="modal-price" id="m-price">A$0 / day</p>
+
+        <div class="pill-row">
+          <span class="pill" id="m-pill-stock">📦 <strong id="m-stock">0</strong> <span id="m-stock-text">left</span></span>
+          <span class="pill">👀 <strong id="m-viewers">0</strong> <span id="m-viewers-text">viewing</span></span>
+          <span class="pill">⏳ <strong id="m-timer">09:59</strong> <span id="m-timer-text">hold</span></span>
+        </div>
+
+        <div class="hr"></div>
+
+        <p class="modal-desc" id="m-desc">
+          Premium quality, fully cleaned and tested. Reserve instantly and pick up at a nearby location.
+        </p>
+
+        <div class="modal-form">
+          <div>
+            <label id="m-pick-label">Pick-up Date</label>
+            <input type="date" id="d1">
+          </div>
+          <div>
+            <label id="m-ret-label">Return Date</label>
+            <input type="date" id="d2">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-wide btn-confirm" onclick="confirmBook()" id="m-confirm">Confirm Booking</button>
+          <button class="btn-wide btn-addcart" onclick="addToCart(cur?.id, true)" id="m-addcart">Add to Cart</button>
+        </div>
+
+        <div class="fineprint" id="m-fineprint">
+          Deposit may apply. Insurance available at checkout (demo).
+        </div>
+
+        <div class="review-mini">
+          <div class="r-stars" id="m-rstars">★★★★★ 4.9</div>
+          <p id="m-rtext">"Arrived spotless and worked perfectly. Pickup was fast and secure."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================= CART DRAWER ========================= -->
+  <div id="cartDrawer">
+    <div class="cart-head">
+      <h3 id="cart-title">Your Cart</h3>
+      <span class="cart-close" onclick="toggleCart(false)">&times;</span>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-foot">
+      <div class="cart-total">
+        <span id="cart-total-label">Estimated Total</span>
+        <span id="cartTotal">A$0</span>
+      </div>
+      <button class="btn-checkout" onclick="checkout()" id="cart-checkout">Checkout (Demo)</button>
+      <div style="font-size:12px;color:#888;margin-top:10px;" id="cart-note">
+        This is a demo checkout. In a real platform, you would proceed to payment.
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================= LEGAL MODAL ========================= -->
+  <div id="legalModal">
+    <div class="legal-box">
+      <div class="legal-head">
+        <h3 id="legalTitle">Legal</h3>
+        <span class="cart-close" onclick="closeLegal()">&times;</span>
+      </div>
+      <div class="legal-body" id="legalBody"></div>
+    </div>
+  </div>
+
+  <!-- ========================= TOAST ========================= -->
+  <div id="toast">Saved</div>
+
+  <!-- ========================= CHAT ========================= -->
+  <button id="chatFab" onclick="toggleChat()">💬</button>
+  <div id="chatBox">
+    <div class="chat-head">
+      <span id="chat-title">Chat with us</span>
+      <span class="chat-close" onclick="toggleChat()">✕</span>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="chat-bubble" id="chat-welcome">
+        Hi! 👋 Need help with deposits, damage policy, or pickup? We reply fast (demo).
+      </div>
+    </div>
+    <div class="chat-actions">
+      <button class="btn1" onclick="chatQuick('policy')" id="chat-btn1">Damage Policy</button>
+      <button class="btn2" onclick="chatQuick('pickup')" id="chat-btn2">Pickup Help</button>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       DATA（商品 + 评论 + 库存 + 热门标签）
+    ========================================================= */
+    const items = [
+      {id:1,  cat:'DIY',  name:'Power Drill',      cn:'强力电钻',  price:5,  img:'images/drill.jpg',    rating:4.9, reviews:128, hot:true,  stock:2},
+      {id:2,  cat:'DIY',  name:'Ladder',          cn:'折叠梯',    price:4,  img:'images/ladder.jpg',   rating:4.8, reviews:94,  hot:false, stock:5},
+      {id:3,  cat:'DIY',  name:'Toolbox',         cn:'工具箱',    price:6,  img:'images/toolbox.jpg',  rating:4.7, reviews:76,  hot:false, stock:4},
+
+      {id:4,  cat:'Tech', name:'VR Headset',      cn:'VR眼镜',    price:20, img:'images/vr.jpg',       rating:4.9, reviews:203, hot:true,  stock:1},
+      {id:5,  cat:'Tech', name:'Action Camera',   cn:'运动相机',  price:15, img:'images/camera.jpg',   rating:4.8, reviews:140, hot:true,  stock:3},
+      {id:6,  cat:'Tech', name:'Drone',           cn:'无人机',    price:25, img:'images/drone.jpg',    rating:4.6, reviews:61,  hot:false, stock:2},
+
+      {id:7,  cat:'Home', name:'Vacuum Cleaner',  cn:'吸尘器',    price:15, img:'images/vacuum.jpg',   rating:4.7, reviews:82,  hot:false, stock:6},
+      {id:8,  cat:'Home', name:'Sewing Machine',  cn:'缝纫机',    price:10, img:'images/sewing.jpg',   rating:4.8, reviews:59,  hot:false, stock:2},
+
+      {id:9,  cat:'Party', name:'Projector',         cn:'投影仪',    price:12, img:'images/projector.jpg', rating:4.9, reviews:189, hot:true,  stock:2},
+      {id:10, cat:'Party', name:'Bluetooth Speaker', cn:'蓝牙音响',  price:8,  img:'images/speaker.jpg',   rating:4.7, reviews:133, hot:false, stock:5},
+      {id:11, cat:'Party', name:'Board Games',       cn:'聚会桌游',  price:5,  img:'images/games.jpg',     rating:4.8, reviews:212, hot:true,  stock:8},
+
+      {id:12, cat:'Home', name:'Camping Tent',     cn:'露营帐篷',  price:10, img:'images/tent.jpg',     rating:4.6, reviews:71,  hot:false, stock:3},
+    ];
+
+    /* =========================================================
+       STATE
+    ========================================================= */
+    let isEn = true;
+    let curCategory = 'All';
+    let cur = null;
+    let holdTimer = null;
+    let holdSeconds = 10 * 60;
+
+    // cart: {id, qty}
+    const cart = [];
+
+    function getCurrencySymbol(){
+      return isEn ? "A$" : "¥";
+    }
+
+    function getDayUnit(){
+      return isEn ? "/day" : "/天";
+    }
+
+    function formatPrice(amount){
+      return `${getCurrencySymbol()}${amount}`;
+    }
+
+    /* =========================================================
+       UTIL
+    ========================================================= */
+    function showToast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 1600);
+    }
+
+    function mockLink(e){
+      e.preventDefault();
+      showToast(isEn ? "Demo link" : "演示链接");
+    }
+
+    function mockAuth(e,type){
+      e.preventDefault();
+      showToast(isEn ? (type==='login'?'Login (demo)':'Sign up (demo)') : (type==='login'?'登录（演示）':'注册（演示）'));
+    }
+
+    /* =========================================================
+       SEARCH + FILTER + SORT
+    ========================================================= */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const s = document.getElementById('navSearch');
+      s.addEventListener('input', ()=>applyFilters());
+    });
+
+    function setCategory(cat, btn){
+      curCategory = cat;
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    }
+
+    function applyFilters(){
+      const q = (document.getElementById('navSearch')?.value || '').trim().toLowerCase();
+      const onlyAvail = document.getElementById('onlyAvailable').checked;
+      const sort = document.getElementById('sortSelect').value;
+
+      let list = items.slice();
+
+      // category
+      if(curCategory !== 'All'){
+        list = list.filter(i => i.cat === curCategory);
+      }
+
+      // search (name + cn + cat)
+      if(q){
+        list = list.filter(i => {
+          const n = (i.name + ' ' + i.cn + ' ' + i.cat).toLowerCase();
+          return n.includes(q);
+        });
+      }
+
+      // only available
+      if(onlyAvail){
+        list = list.filter(i => i.stock > 0);
+      }
+
+      // sorting
+      if(sort === 'price-asc') list.sort((a,b)=>a.price-b.price);
+      else if(sort === 'price-desc') list.sort((a,b)=>b.price-a.price);
+      else if(sort === 'rating-desc') list.sort((a,b)=>b.rating-a.rating);
+
+      render(list);
+    }
+
+    /* =========================================================
+       RENDER CARDS（含星级/热卖/骨架屏）
+    ========================================================= */
+    function render(list){
+      const grid = document.getElementById('item-grid');
+      grid.innerHTML = '';
+
+      document.getElementById('resultCount').textContent =
+        isEn ? `${list.length} items` : `${list.length} 个物品`;
+
+      list.forEach(item=>{
+        const title = isEn ? item.name : item.cn;
+        const viewTxt = isEn ? 'View' : '查看';
+        const addTxt = isEn ? 'Add' : '加入';
+        const stockTxt = item.stock <= 0 ? (isEn?'Out of stock':'已借完') : (item.stock === 1 ? (isEn?'Low stock':'库存紧张') : (isEn?'Available':'有货'));
+        const dotClass = item.stock <= 0 ? 'out' : (item.stock === 1 ? 'low' : 'ok');
+
+        const stars = '★★★★★'.slice(0, Math.round(item.rating)) + '☆☆☆☆☆'.slice(0, 5-Math.round(item.rating));
+        const ratingLabel = `${item.rating.toFixed(1)} (${item.reviews})`;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        card.innerHTML = `
+          <div class="img-box">
+            <div class="skeleton"></div>
+            <span class="tag">${item.cat}</span>
+            ${item.hot ? `<span class="hot-badge">${isEn?'Best Seller':'热销'}</span>` : ``}
+            <img src="${item.img}" alt="${title}" loading="lazy"
+                 onload="this.previousElementSibling && this.previousElementSibling.remove()"
+                 onerror="this.style.display='none'; this.parentElement.querySelector('.skeleton')?.remove();" />
+          </div>
+
+          <div class="card-content">
+            <h3>${title}</h3>
+
+            <div class="meta-row">
+              <div class="price">${formatPrice(item.price)}<small>${getDayUnit()}</small></div>
+              <div class="rating" title="${ratingLabel}">
+                <span aria-hidden="true">${stars}</span>
+                <span>${ratingLabel}</span>
+              </div>
+            </div>
+
+            <div class="availability">
+              <span class="dot ${dotClass}"></span>
+              <span>${stockTxt}</span>
+              <span style="margin-left:auto;color:#999;font-weight:800;">${isEn?'ID':'编号'}: ${item.id}</span>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn btn-view" onclick="openModal(${item.id})">${viewTxt}</button>
+              <button class="btn btn-add" onclick="addToCart(${item.id}, false)">${addTxt}</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* =========================================================
+       MODAL（含面包屑 + 库存/浏览/倒计时）
+    ========================================================= */
+    function openModal(id){
+      cur = items.find(i=>i.id===id);
+      if(!cur) return;
+
+      // breadcrumb（面包屑）
+      const cat = cur.cat;
+      const name = isEn ? cur.name : cur.cn;
+      document.getElementById('m-breadcrumbs').textContent =
+        isEn ? `Home > Catalogue > ${cat} > ${cur.name}` : `首页 > 物品目录 > ${cat} > ${cur.cn}`;
+
+      // basic info
+      document.getElementById('m-title').textContent = name;
+      document.getElementById('m-price').textContent = `${formatPrice(cur.price)} ${getDayUnit()}`;
+      document.getElementById('m-img').src = cur.img;
+
+      // stock / viewers
+      document.getElementById('m-stock').textContent = cur.stock;
+      document.getElementById('m-viewers').textContent = Math.max(1, Math.floor(Math.random()*6) + 1);
+
+      document.getElementById('m-desc').textContent = isEn
+        ? `Premium ${cur.name} — cleaned, tested, and ready. Reserve online and pick up with a secure workflow.`
+        : `高品质${cur.cn}，已清洁消毒并测试。在线预订，到点取货，流程安全可靠。`;
+
+      // mini review text
+      document.getElementById('m-rstars').textContent = `★★★★★ ${cur.rating.toFixed(1)} (${cur.reviews})`;
+      document.getElementById('m-rtext').textContent = isEn
+        ? `"Great condition and super easy pickup. Would rent again!"`
+        : `"成色很好，取货很方便，下次还会租！"`;
+
+      // low stock / urgency (marketing conversion)
+      const fine = document.getElementById('m-fineprint');
+      if(cur.stock <= 0){
+        fine.textContent = isEn
+          ? "Currently unavailable. Check back soon (demo)."
+          : "当前已借完，稍后再来看看（演示）。";
+      }else if(cur.stock === 1){
+        fine.textContent = isEn
+          ? "Only 1 left — high demand. 3 people viewing right now."
+          : "只剩 1 件 — 需求很高。当前有 3 人正在浏览。";
+      }else{
+        fine.textContent = isEn
+          ? "Deposit may apply. Damage Protection available (demo)."
+          : "部分物品可能需要押金，可选损坏保障（演示）。";
+      }
+
+      // start hold timer
+      startHoldTimer();
+
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal(){
+      document.getElementById('modal').style.display = 'none';
+      stopHoldTimer();
+    }
+
+    function startHoldTimer(){
+      stopHoldTimer();
+      holdSeconds = 10*60;
+      tickTimer();
+      holdTimer = setInterval(()=>{
+        holdSeconds--;
+        tickTimer();
+        if(holdSeconds<=0){
+          stopHoldTimer();
+          showToast(isEn ? "Hold expired (demo)" : "保留时间到（演示）");
+        }
+      },1000);
+    }
+    function stopHoldTimer(){
+      if(holdTimer){ clearInterval(holdTimer); holdTimer=null; }
+    }
+    function tickTimer(){
+      const m = String(Math.floor(holdSeconds/60)).padStart(2,'0');
+      const s = String(holdSeconds%60).padStart(2,'0');
+      document.getElementById('m-timer').textContent = `${m}:${s}`;
+    }
+
+    function confirmBook(){
+      if(!cur) return;
+      if(cur.stock <= 0){
+        showToast(isEn ? "Out of stock" : "已借完");
+        return;
+      }
+      addToCart(cur.id, true);
+      closeModal();
+      showToast(isEn ? "Reservation added to cart" : "已加入借阅清单");
+    }
+
+    /* =========================================================
+       CART（购物车/借阅清单）
+    ========================================================= */
+    function addToCart(id, fromModal){
+      const item = items.find(i=>i.id===id);
+      if(!item) return;
+
+      if(item.stock <= 0){
+        showToast(isEn ? "Out of stock" : "已借完");
+        return;
+      }
+
+      const found = cart.find(c=>c.id===id);
+      if(found) found.qty += 1;
+      else cart.push({id, qty:1});
+
+      // demo: reduce stock when add
+      item.stock = Math.max(0, item.stock - 1);
+
+      updateCartBadge();
+      renderCart();
+
+      if(!fromModal){
+        showToast(isEn ? "Added to cart" : "已加入");
+      }
+      applyFilters(); // refresh availability display
+    }
+
+    function updateCartBadge(){
+      const count = cart.reduce((sum,c)=>sum+c.qty,0);
+      document.getElementById('cartCount').textContent = count;
+    }
+
+    function toggleCart(open){
+      const d = document.getElementById('cartDrawer');
+      if(open) d.classList.add('open');
+      else d.classList.remove('open');
+      renderCart();
+    }
+
+    function renderCart(){
+      const body = document.getElementById('cartBody');
+      body.innerHTML = '';
+
+      if(cart.length===0){
+        body.innerHTML = `<div style="padding:14px;color:#777;font-weight:800;">${isEn?'Your cart is empty.':'你的借阅清单是空的。'}</div>`;
+        document.getElementById('cartTotal').textContent = formatPrice(0);
+        return;
+      }
+
+      let total = 0;
+      cart.forEach(c=>{
+        const item = items.find(i=>i.id===c.id);
+        if(!item) return;
+
+        total += item.price * c.qty; // demo total (not date-based)
+        const title = isEn ? item.name : item.cn;
+
+        const row = document.createElement('div');
+        row.className='cart-item';
+        row.innerHTML = `
+          <div class="cart-thumb"><img src="${item.img}" alt="${title}" onerror="this.style.display='none'"></div>
+          <div class="cart-info">
+            <strong>${title}</strong>
+            <span>${formatPrice(item.price)}${getDayUnit()} · ${isEn?'Qty':'数量'}: ${c.qty}</span>
+          </div>
+          <div class="cart-qty">
+            <button class="qty-btn" onclick="changeQty(${c.id}, -1)">-</button>
+            <span>${c.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${c.id}, 1)">+</button>
+          </div>
+        `;
+        body.appendChild(row);
+      });
+
+      document.getElementById('cartTotal').textContent = formatPrice(total);
+    }
+
+    function changeQty(id, delta){
+      const c = cart.find(x=>x.id===id);
+      const item = items.find(i=>i.id===id);
+      if(!c || !item) return;
+
+      if(delta > 0){
+        // adding qty consumes stock
+        if(item.stock <= 0){
+          showToast(isEn ? "No more stock" : "没有库存了");
+          return;
+        }
+        item.stock -= 1;
+        c.qty += 1;
+      }else{
+        // removing qty restores stock
+        c.qty -= 1;
+        item.stock += 1;
+        if(c.qty <= 0){
+          const idx = cart.findIndex(x=>x.id===id);
+          cart.splice(idx, 1);
+        }
+      }
+
+      updateCartBadge();
+      renderCart();
+      applyFilters();
+    }
+
+    function checkout(){
+      if(cart.length===0){
+        showToast(isEn ? "Cart empty" : "清单为空");
+        return;
+      }
+      showToast(isEn ? "Checkout complete (demo)" : "结算完成（演示）");
+      toggleCart(false);
+    }
+
+    /* =========================================================
+       NEWSLETTER（订阅）
+    ========================================================= */
+    function subscribe(e){
+      e.preventDefault();
+      const email = document.getElementById('newsEmail').value.trim();
+      if(!email) return;
+      showToast(isEn ? "Subscribed! (demo)" : "订阅成功！（演示）");
+      document.getElementById('newsEmail').value = '';
+    }
+
+    /* =========================================================
+       CHAT（客服）
+    ========================================================= */
+    function toggleChat(){
+      const box = document.getElementById('chatBox');
+      box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+    }
+    function chatQuick(type){
+      const body = document.getElementById('chatBody');
+      const msg = document.createElement('div');
+      msg.className='chat-bubble';
+      if(type==='policy'){
+        msg.textContent = isEn
+          ? "Damage policy (demo): Optional coverage + simple claim flow. Return item and report within 24 hours."
+          : "损坏政策（演示）：可选保障 + 简化理赔流程。归还并在 24 小时内报备即可。";
+      }else{
+        msg.textContent = isEn
+          ? "Pickup help (demo): You’ll receive a QR code. Scan at locker to open. Support is available 24/7."
+          : "取货帮助（演示）：你会收到二维码，到柜机扫码开门。支持 24 小时在线。";
+      }
+      body.appendChild(msg);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    /* =========================================================
+       LEGAL（隐私/条款）
+    ========================================================= */
+    function openLegal(e, type){
+      e.preventDefault();
+      const modal = document.getElementById('legalModal');
+      const title = document.getElementById('legalTitle');
+      const body = document.getElementById('legalBody');
+
+      if(type==='privacy'){
+        title.textContent = isEn ? "Privacy Policy" : "隐私政策";
+        body.innerHTML = `
+          <p><strong>${isEn?'Overview':'概述'}：</strong>${isEn?'We only collect necessary information to provide rental services.':'我们仅收集提供租赁服务所需的必要信息。'}</p>
+          <p><strong>${isEn?'Data Use':'数据用途'}：</strong>${isEn?'Used for booking, identity verification (if enabled), and support.':'用于预订、身份验证（如启用）与客户支持。'}</p>
+          <p><strong>${isEn?'Data Security':'数据安全'}：</strong>${isEn?'We apply reasonable technical measures to protect your data.':'我们采用合理的技术措施保护你的数据安全。'}</p>
+          <p style="color:#888;font-size:12px;">${isEn?'This is demo text for a student project.':'以上为学生项目演示文本。'}</p>
+        `;
+      }else if(type==='terms'){
+        title.textContent = isEn ? "Terms of Service" : "服务条款";
+        body.innerHTML = `
+          <p><strong>${isEn?'Rental Rules':'租赁规则'}：</strong>${isEn?'Return on time, keep items in good condition, and report issues promptly.':'按时归还、妥善使用、问题及时报备。'}</p>
+          <p><strong>${isEn?'Fees':'费用'}：</strong>${isEn?'Late fees may apply; deposits may be required for high-value items.':'可能产生逾期费；高价值物品可能需要押金。'}</p>
+          <p><strong>${isEn?'Liability':'责任'}：</strong>${isEn?'Damage protection reduces liability when chosen.':'选择损坏保障可降低风险与责任。'}</p>
+          <p style="color:#888;font-size:12px;">${isEn?'This is demo text for a student project.':'以上为学生项目演示文本。'}</p>
+        `;
+      }else{
+        title.textContent = isEn ? "Cookie Policy" : "Cookie 政策";
+        body.innerHTML = `
+          <p>${isEn?'We use cookies to improve experience, remember preferences, and measure basic site analytics.':'我们使用 Cookie 来提升体验、记住偏好并进行基础统计。'}</p>
+          <p style="color:#888;font-size:12px;">${isEn?'This is demo text for a student project.':'以上为学生项目演示文本。'}</p>
+        `;
+      }
+
+      modal.style.display = 'flex';
+    }
+    function closeLegal(){
+      document.getElementById('legalModal').style.display = 'none';
+    }
+
+    /* =========================================================
+       MAP（可缩放地图 + 十字大头针 + 尽量精准的地理编码）
+       - 你要求“完全精准”：我做了地址自动地理编码，并提供手动写死坐标入口
+    ========================================================= */
+    let map, marker1, marker2;
+    let loc1 = { lat:null, lng:null };
+    let loc2 = { lat:null, lng:null };
+
+    // ✅ 你可以在这里“写死坐标”（最精准，100%确定）
+    // 如果你已经拿到精确经纬度，把下面两行取消注释并填写即可：
+    // const FORCE_LOC1 = { lat: 34.#####, lng: 113.##### };
+    // const FORCE_LOC2 = { lat: 34.#####, lng: 113.##### };
+    const FORCE_LOC1 = null;
+    const FORCE_LOC2 = null;
+
+    // ✅ 地理编码用的“精准地址”（可改）
+    const GEO_QUERY_1_CN = "郑州 绿地中心 双子塔 南塔";
+    // 你说要“更多人使用的地方”，我把自助柜默认定位到“郑州东站 出站口/地铁换乘区域”这一类高人流点
+    // 如果你想换成别的位置，把这句改成你想要的：比如 “郑州东站 地铁站 入口”
+    const GEO_QUERY_2_CN = "郑州东站 出站口";
+    const GEO_QUERY_1_EN = "Greenland Twin Towers South Tower, Zhengzhou, China";
+    const GEO_QUERY_2_EN = "Zhengzhou East Railway Station Exit, Zhengzhou, China";
+
+    function makeCrossPinIcon(color){
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 64 64">
+          <defs>
+            <filter id="s" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.25"/>
+            </filter>
+          </defs>
+          <path filter="url(#s)" d="M32 4c-10.5 0-19 8.5-19 19 0 14.2 16.4 31.8 18.1 33.6.5.5 1.3.5 1.8 0C34.6 54.8 51 37.2 51 23 51 12.5 42.5 4 32 4z"
+                fill="${color}"/>
+          <circle cx="32" cy="23" r="11" fill="#fff" opacity="0.95"/>
+          <circle cx="32" cy="23" r="7.8" fill="none" stroke="#2d7bc7" stroke-width="2.5"/>
+          <line x1="32" y1="13" x2="32" y2="33" stroke="#2d7bc7" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="22" y1="23" x2="42" y2="23" stroke="#2d7bc7" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="32" cy="23" r="2.2" fill="#2d7bc7"/>
+        </svg>
+      `.trim();
+      const url = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+      return L.icon({
+        iconUrl:url,
+        iconSize:[48,48],
+        iconAnchor:[24,46],
+        popupAnchor:[0,-46],
+        className:"custom-pin"
+      });
+    }
+
+    async function geocodePhoton(query){
+      const url = "https://photon.komoot.io/api/?q=" + encodeURIComponent(query) + "&limit=1&lang=zh";
+      const r = await fetch(url);
+      if(!r.ok) throw new Error("photon fail");
+      const data = await r.json();
+      const f = data?.features?.[0];
+      if(!f) throw new Error("photon empty");
+      const [lng,lat] = f.geometry.coordinates;
+      return {lat, lng};
+    }
+
+    async function geocodeNominatim(query){
+      const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(query);
+      const r = await fetch(url, { headers: { "Accept":"application/json" }});
+      if(!r.ok) throw new Error("nominatim fail");
+      const data = await r.json();
+      const f = data?.[0];
+      if(!f) throw new Error("nominatim empty");
+      return { lat: parseFloat(f.lat), lng: parseFloat(f.lon) };
+    }
+
+    async function geocodeSmart(query){
+      try{ return await geocodePhoton(query); }
+      catch(e){
+        return await geocodeNominatim(query);
+      }
+    }
+
+    function getPopup1(){
+      return isEn
+        ? "<b>Greenland Twin Towers (South Tower)</b><br>Precise pickup point"
+        : "<b>绿地双子塔（南塔）</b><br>精准定位取货点";
+    }
+    function getPopup2(){
+      return isEn
+        ? "<b>Self-Service Locker</b><br>High-traffic pickup spot"
+        : "<b>自助取货柜</b><br>高人流取货点";
+    }
+
+    async function initMap(){
+      const mapEl = document.getElementById('map');
+
+      if(typeof L === "undefined"){
+        mapEl.innerHTML = `<div style="padding:18px;color:#fff;font-weight:900;">${isEn?'Map failed to load. Check internet.':'地图加载失败，请检查网络。'}</div>`;
+        return;
+      }
+
+      map = L.map("map", { scrollWheelZoom:true, zoomControl:true }).setView([34.746, 113.65], 12);
+
+      const street = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom:19,
+        attribution:'&copy; OpenStreetMap contributors'
+      });
+      const satellite = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom:19, attribution:"Tiles &copy; Esri" }
+      );
+      street.addTo(map);
+      L.control.layers({ "Street":street, "Satellite":satellite }, null, { position:"topright" }).addTo(map);
+
+      const iconA = makeCrossPinIcon("#f27c21");
+      const iconB = makeCrossPinIcon("#2d7bc7");
+
+      // Step 1: compute coordinates (force -> geocode -> fallback)
+      if(FORCE_LOC1){
+        loc1 = FORCE_LOC1;
+      }else{
+        const q1 = isEn ? GEO_QUERY_1_EN : GEO_QUERY_1_CN;
+        loc1 = await safeGeocode(q1, {lat:34.7419, lng:113.7336});
+      }
+
+      if(FORCE_LOC2){
+        loc2 = FORCE_LOC2;
+      }else{
+        const q2 = isEn ? GEO_QUERY_2_EN : GEO_QUERY_2_CN;
+        loc2 = await safeGeocode(q2, {lat:34.7526, lng:113.8181});
+      }
+
+      marker1 = L.marker([loc1.lat, loc1.lng], { icon:iconA }).addTo(map).bindPopup(getPopup1());
+      marker2 = L.marker([loc2.lat, loc2.lng], { icon:iconB }).addTo(map).bindPopup(getPopup2());
+
+      const bounds = L.latLngBounds([[loc1.lat, loc1.lng], [loc2.lat, loc2.lng]]);
+      map.fitBounds(bounds.pad(0.25));
+
+      setTimeout(()=>map.invalidateSize(), 250);
+      window.addEventListener("resize", ()=>map && map.invalidateSize());
+    }
+
+    async function safeGeocode(query, fallback){
+      try{
+        return await geocodeSmart(query);
+      }catch(e){
+        return fallback;
+      }
+    }
+
+    function openMarker(which){
+      if(!map) return;
+      const m = (which===1) ? marker1 : marker2;
+      if(!m) return;
+      map.setView(m.getLatLng(), 16, { animate:true });
+      m.openPopup();
+    }
+
+    function copyCoords(which){
+      const p = (which===1) ? loc1 : loc2;
+      if(!p?.lat || !p?.lng){
+        showToast(isEn ? "Coordinates not ready" : "坐标未就绪");
+        return;
+      }
+      const text = `${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`;
+      navigator.clipboard?.writeText(text).then(()=>{
+        showToast(isEn ? "Copied: "+text : "已复制："+text);
+      }).catch(()=>{
+        showToast(isEn ? "Copy failed" : "复制失败");
+      });
+    }
+
+    /* =========================================================
+       LANGUAGE（中英切换：把新增模块也一起切）
+    ========================================================= */
+    function toggleLang(){
+      isEn = !isEn;
+
+      const t = isEn ? {
+        navHome:"Home", navCat:"Catalogue", navLoc:"Locations",
+        navLogin:"Log in", navSignup:"Sign up",
+        hero:"Own Less. Do More.",
+        heroSub:"Your city's premier library of things. Borrow high-quality tools, tech, and party gear instantly.",
+        heroBtn:"Explore Library",
+
+        trust1t:"Damage Protection", trust1d:"Optional coverage for accidental damage during rentals.",
+        trust2t:"Deposit Escrow", trust2d:"Deposits held securely and released after return inspection.",
+        trust3t:"Verified Users", trust3d:"Identity verification for borrowers and partners.",
+
+        howTitle:"How BorrowGo Works",
+        how1t:"Book Online", how1d:"Browse our inventory and reserve items for the dates you need.",
+        how2t:"Pick Up", how2d:"Collect from our 24/7 smart lockers or central hub using a QR code.",
+        how3t:"Enjoy & Return", how3d:"Use the item, then drop it back. We handle cleaning and maintenance.",
+
+        catTitle:"Catalogue",
+        sortDefault:"Sort: Recommended",
+        sortPA:"Price: Low to High",
+        sortPD:"Price: High to Low",
+        sortRD:"Rating: High to Low",
+        onlyAvail:"Only available",
+
+        memberTitle:"Membership",
+        m1:"Standard Member",
+        m1_1:"Pay deposit for higher-value items",
+        m1_2:"Regular pricing",
+        m1_3:"Basic support",
+        m1_btn:"Choose",
+        m2:"BorrowGo Plus",
+        m2_1:"Lower / no deposit on most items",
+        m2_2:"Exclusive discounts (up to 50% off)",
+        m2_3:"Priority support & faster pickup",
+        m2_btn:"Upgrade",
+        m2_btn2:"Benefits",
+
+        reviewsTitle:"Trusted by Neighbors",
+        rev1:`"Saved me A$200 on buying a drill I only used once. The pickup at the locker was super smooth!"`,
+        rev2:`"The VR headset was in perfect condition. Great for my weekend party. Highly recommend!"`,
+        rev3:`"Loved the projector for movie night. Customer support replied in minutes. Felt very secure."`,
+        verified:"Verified Borrower",
+
+        faqTitle:"Help & FAQ",
+        q1:"What if I accidentally damage an item?",
+        a1:"You can choose Damage Protection at checkout. If damage happens, we’ll guide you through a simple claim process.",
+        q2:"Do I need to clean the item before returning?",
+        a2:"Light cleaning is appreciated, but we handle professional cleaning and maintenance after each rental.",
+        q3:"How does deposit escrow work?",
+        a3:"Deposits are held securely and automatically released after the return inspection is completed.",
+        q4:"Can I cancel my booking?",
+        a4:"Yes. Cancellation rules vary by item and date. In this demo, cancellation is always allowed before pickup day.",
+
+        locTitle:"Pick-up Locations",
+        loc1t:"Greenland Twin Towers",
+        loc2t:"Self-Service Locker",
+        addr1:"Greenland Central Plaza, South Tower,<br>Dongfeng South Road,<br>Zhengdong New District, Zhengzhou",
+        addr2:"Zhengzhou East Railway Station,<br>High-traffic exit area",
+        loc1b:"Available Now",
+        loc2b:"24/7 Access",
+        focus:"Focus on Map",
+        copy:"Copy Coordinates",
+        preciseTitle:"Precision Note:",
+        precise:"Pins are auto-geocoded by address (Photon → Nominatim). For 100% exact points, you can set LAT/LNG in code directly.",
+
+        newsTitle:"Don't Miss Out!",
+        newsDesc:`Join our community and get <strong>20% off</strong> your first rental.`,
+        newsBtn:"Subscribe",
+
+        footCompany:"Company",
+        footSupport:"Support",
+        footLegal:"Legal",
+        footAbout:"Empowering communities to own less and do more. The smart way to access the things you need.",
+        aboutus:"About Us", careers:"Careers", press:"Press", blog:"Blog",
+        help:"Help Center", safety:"Safety Information", cancel:"Cancellation Options",
+        privacy:"Privacy Policy", terms:"Terms of Service", cookie:"Cookie Policy",
+
+        cartTitle:"Your Cart",
+        cartTotalLabel:"Estimated Total",
+        cartCheckout:"Checkout (Demo)",
+        cartNote:"This is a demo checkout. In a real platform, you would proceed to payment.",
+
+        mPick:"Pick-up Date", mRet:"Return Date",
+        mConfirm:"Confirm Booking", mAdd:"Add to Cart",
+        mStockText:"left", mViewText:"viewing", mHoldText:"hold",
+
+        chatTitle:"Chat with us",
+        chatWelcome:"Hi! 👋 Need help with deposits, damage policy, or pickup? We reply fast (demo).",
+        chatBtn1:"Damage Policy",
+        chatBtn2:"Pickup Help",
+      } : {
+        navHome:"首页", navCat:"目录", navLoc:"地点",
+        navLogin:"登录", navSignup:"注册",
+        hero:"少买，多做。",
+        heroSub:"城市里的“物品图书馆”，工具、数码、聚会装备一键借用。",
+        heroBtn:"探索物品库",
+
+        trust1t:"损坏保障", trust1d:"可选保障覆盖租赁期间的意外损坏（演示）。",
+        trust2t:"押金托管", trust2d:"押金安全托管，归还验收后自动释放（演示）。",
+        trust3t:"实名认证", trust3d:"借用人与合作方身份验证提升安全性（演示）。",
+
+        howTitle:"BorrowGo 如何运作",
+        how1t:"在线预订", how1d:"浏览物品，选择日期，一键预订。",
+        how2t:"扫码取货", how2d:"到 24/7 自助柜或中心点，扫码取走。",
+        how3t:"使用归还", how3d:"尽情使用后归还，我们负责清洁维护。",
+
+        catTitle:"物品目录",
+        sortDefault:"排序：推荐",
+        sortPA:"价格：从低到高",
+        sortPD:"价格：从高到低",
+        sortRD:"评分：从高到低",
+        onlyAvail:"只看有货",
+
+        memberTitle:"会员体系",
+        m1:"普通会员",
+        m1_1:"高价值物品可能需要押金",
+        m1_2:"常规价格",
+        m1_3:"基础客服支持",
+        m1_btn:"选择",
+        m2:"BorrowGo Plus",
+        m2_1:"大部分物品免押或低押金",
+        m2_2:"专属折扣（最高 5 折）",
+        m2_3:"优先支持 & 更快取货",
+        m2_btn:"升级",
+        m2_btn2:"权益",
+
+        reviewsTitle:"邻里都在用",
+        rev1:`"电钻只用一次，租比买省太多了！自助柜取货很顺畅。"`,
+        rev2:`"VR 设备状态完美，周末派对效果爆炸，强烈推荐！"`,
+        rev3:`"投影仪看电影太爽了，客服回复很快，很有安全感。"`,
+        verified:"已认证用户",
+
+        faqTitle:"帮助与常见问题",
+        q1:"如果不小心弄坏了怎么办？",
+        a1:"结算时可选择损坏保障。发生损坏后，我们会引导你完成简化的理赔流程（演示）。",
+        q2:"归还前需要清洗吗？",
+        a2:"简单擦拭即可，我们会进行专业清洁与维护。",
+        q3:"押金托管怎么运作？",
+        a3:"押金安全托管，归还验收完成后自动释放（演示）。",
+        q4:"可以取消预订吗？",
+        a4:"可以。此演示版本默认取货日前都可取消。",
+
+        locTitle:"取货地点",
+        loc1t:"绿地双子塔",
+        loc2t:"自助取货柜",
+        addr1:"郑州市郑东新区东风南路<br>绿地中心双子塔南塔",
+        addr2:"郑州东站<br>高人流出站区域",
+        loc1b:"可立即取货",
+        loc2b:"24小时可取",
+        focus:"定位到地图",
+        copy:"复制坐标",
+        preciseTitle:"精度说明：",
+        precise:"标记点由地址自动地理编码（Photon → Nominatim）。若要 100% 精准，可直接在代码里写死经纬度。",
+
+        newsTitle:"别错过！",
+        newsDesc:`加入社区，首单 <strong>8 折</strong>（演示）。`,
+        newsBtn:"订阅",
+
+        footCompany:"公司",
+        footSupport:"支持",
+        footLegal:"法律",
+        footAbout:"让社区少买多用，随借随还，安全省心。",
+        aboutus:"关于我们", careers:"加入我们", press:"媒体", blog:"博客",
+        help:"帮助中心", safety:"安全信息", cancel:"取消政策",
+        privacy:"隐私政策", terms:"服务条款", cookie:"Cookie 政策",
+
+        cartTitle:"借阅清单",
+        cartTotalLabel:"预估总价",
+        cartCheckout:"去结算（演示）",
+        cartNote:"此处为演示结算流程，真实平台会进入支付环节。",
+
+        mPick:"取货日期", mRet:"归还日期",
+        mConfirm:"确认预订", mAdd:"加入清单",
+        mStockText:"件剩余", mViewText:"人在看", mHoldText:"保留",
+
+        chatTitle:"在线客服",
+        chatWelcome:"你好！👋 需要押金/损坏保障/取货帮助？我们会快速回复（演示）。",
+        chatBtn1:"损坏政策",
+        chatBtn2:"取货帮助",
+      };
+
+      // nav
+      document.getElementById('nav-home').textContent = t.navHome;
+      document.getElementById('nav-cat').textContent = t.navCat;
+      document.getElementById('nav-loc').textContent = t.navLoc;
+      document.getElementById('nav-login').textContent = t.navLogin;
+      document.getElementById('nav-signup').textContent = t.navSignup;
+      document.getElementById('navSearch').placeholder = isEn ? "Search for tools, cameras..." : "搜索工具、相机、帐篷...";
+
+      // hero
+      document.getElementById('txt-hero').textContent = t.hero;
+      document.getElementById('txt-hero-sub').textContent = t.heroSub;
+      document.getElementById('btn-hero').textContent = t.heroBtn;
+
+      // trust
+      document.getElementById('trust-1-title').textContent = t.trust1t;
+      document.getElementById('trust-1-desc').textContent = t.trust1d;
+      document.getElementById('trust-2-title').textContent = t.trust2t;
+      document.getElementById('trust-2-desc').textContent = t.trust2d;
+      document.getElementById('trust-3-title').textContent = t.trust3t;
+      document.getElementById('trust-3-desc').textContent = t.trust3d;
+
+      // how
+      document.getElementById('how-title').textContent = t.howTitle;
+      document.getElementById('how-1-title').textContent = t.how1t;
+      document.getElementById('how-1-desc').textContent = t.how1d;
+      document.getElementById('how-2-title').textContent = t.how2t;
+      document.getElementById('how-2-desc').textContent = t.how2d;
+      document.getElementById('how-3-title').textContent = t.how3t;
+      document.getElementById('how-3-desc').textContent = t.how3d;
+
+      // catalogue
+      document.getElementById('txt-cat-title').textContent = t.catTitle;
+      document.getElementById('sort-default').textContent = t.sortDefault;
+      document.getElementById('sort-pa').textContent = t.sortPA;
+      document.getElementById('sort-pd').textContent = t.sortPD;
+      document.getElementById('sort-rd').textContent = t.sortRD;
+      document.getElementById('toggle-available').textContent = t.onlyAvail;
+
+      // member
+      document.getElementById('member-title').textContent = t.memberTitle;
+      document.getElementById('member-1-title').textContent = t.m1;
+      document.getElementById('member-1-1').textContent = t.m1_1;
+      document.getElementById('member-1-2').textContent = t.m1_2;
+      document.getElementById('member-1-3').textContent = t.m1_3;
+      document.getElementById('member-1-btn').textContent = t.m1_btn;
+      document.getElementById('member-2-title').textContent = t.m2;
+      document.getElementById('member-2-1').textContent = t.m2_1;
+      document.getElementById('member-2-2').textContent = t.m2_2;
+      document.getElementById('member-2-3').textContent = t.m2_3;
+      document.getElementById('member-2-btn').textContent = t.m2_btn;
+      document.getElementById('member-2-btn2').textContent = t.m2_btn2;
+
+      // reviews
+      document.getElementById('reviews-title').textContent = t.reviewsTitle;
+      document.getElementById('rev-1-text').textContent = t.rev1;
+      document.getElementById('rev-2-text').textContent = t.rev2;
+      document.getElementById('rev-3-text').textContent = t.rev3;
+      document.getElementById('rev-1-badge').textContent = t.verified;
+      document.getElementById('rev-2-badge').textContent = t.verified;
+      document.getElementById('rev-3-badge').textContent = t.verified;
+
+      // faq
+      document.getElementById('faq-title').textContent = t.faqTitle;
+      document.getElementById('faq-q1').textContent = t.q1;
+      document.getElementById('faq-a1').textContent = t.a1;
+      document.getElementById('faq-q2').textContent = t.q2;
+      document.getElementById('faq-a2').textContent = t.a2;
+      document.getElementById('faq-q3').textContent = t.q3;
+      document.getElementById('faq-a3').textContent = t.a3;
+      document.getElementById('faq-q4').textContent = t.q4;
+      document.getElementById('faq-a4').textContent = t.a4;
+
+      // locations
+      document.getElementById('txt-loc-title').textContent = t.locTitle;
+      document.getElementById('loc-1-title').textContent = t.loc1t;
+      document.getElementById('loc-2-title').textContent = t.loc2t;
+      document.getElementById('txt-addr-1').innerHTML = t.addr1;
+      document.getElementById('txt-addr-2').innerHTML = t.addr2;
+      document.getElementById('loc-1-badge').textContent = t.loc1b;
+      document.getElementById('loc-2-badge').textContent = t.loc2b;
+      document.getElementById('btn-focus-1').textContent = t.focus;
+      document.getElementById('btn-focus-2').textContent = t.focus;
+      document.getElementById('btn-copy-1').textContent = t.copy;
+      document.getElementById('btn-copy-2').textContent = t.copy;
+      document.getElementById('precise-note-title').textContent = t.preciseTitle;
+      document.getElementById('precise-note').textContent = t.precise;
+
+      // newsletter
+      document.getElementById('news-title').textContent = t.newsTitle;
+      document.getElementById('news-desc').innerHTML = t.newsDesc;
+      document.getElementById('news-btn').textContent = t.newsBtn;
+      document.getElementById('newsEmail').placeholder = isEn ? "Enter your email address" : "输入邮箱地址";
+
+      // footer
+      document.getElementById('foot-company-title').textContent = t.footCompany;
+      document.getElementById('foot-support-title').textContent = t.footSupport;
+      document.getElementById('foot-legal-title').textContent = t.footLegal;
+      document.getElementById('foot-about').textContent = t.footAbout;
+      document.getElementById('foot-aboutus').textContent = t.aboutus;
+      document.getElementById('foot-careers').textContent = t.careers;
+      document.getElementById('foot-press').textContent = t.press;
+      document.getElementById('foot-blog').textContent = t.blog;
+      document.getElementById('foot-help').textContent = t.help;
+      document.getElementById('foot-safety').textContent = t.safety;
+      document.getElementById('foot-cancel').textContent = t.cancel;
+      document.getElementById('foot-privacy').textContent = t.privacy;
+      document.getElementById('foot-terms').textContent = t.terms;
+      document.getElementById('foot-cookie').textContent = t.cookie;
+
+      // cart
+      document.getElementById('cart-title').textContent = t.cartTitle;
+      document.getElementById('cart-total-label').textContent = t.cartTotalLabel;
+      document.getElementById('cart-checkout').textContent = t.cartCheckout;
+      document.getElementById('cart-note').textContent = t.cartNote;
+
+      // modal
+      document.getElementById('m-pick-label').textContent = t.mPick;
+      document.getElementById('m-ret-label').textContent = t.mRet;
+      document.getElementById('m-confirm').textContent = t.mConfirm;
+      document.getElementById('m-addcart').textContent = t.mAdd;
+      document.getElementById('m-stock-text').textContent = t.mStockText;
+      document.getElementById('m-viewers-text').textContent = t.mViewText;
+      document.getElementById('m-timer-text').textContent = t.mHoldText;
+
+      // chat
+      document.getElementById('chat-title').textContent = t.chatTitle;
+      document.getElementById('chat-welcome').textContent = t.chatWelcome;
+      document.getElementById('chat-btn1').textContent = t.chatBtn1;
+      document.getElementById('chat-btn2').textContent = t.chatBtn2;
+
+      // update map popups language
+      if(marker1) marker1.setPopupContent(getPopup1());
+      if(marker2) marker2.setPopupContent(getPopup2());
+
+      // re-render products in new language
+      applyFilters();
+    }
+
+    /* =========================================================
+       INIT
+    ========================================================= */
+    window.onload = () => {
+      updateCartBadge();
+      applyFilters();
+      initMap();
+    };
+
+    // close modal on background click
+    document.getElementById('modal').addEventListener('click', (e)=>{
+      if(e.target === document.getElementById('modal')) closeModal();
+    });
+  </script>
+
+</body>
+</html>
